@@ -1,0 +1,137 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="relative bg-gradient-to-r from-blue-900 to-indigo-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Selamat Datang di Santara Hotel</h1>
+            <p class="text-xl md:text-2xl mb-8 text-blue-200">Pengalaman Menginap yang Tak Terlupakan</p>
+            <a href="{{ route('rooms.index') }}" class="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition">
+                Pesan Kamar Sekarang
+            </a>
+        </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-100 to-transparent"></div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+    <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8">
+        <form action="{{ route('rooms.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+                <input type="date" name="check_in" class="w-full rounded-lg border-gray-300 border px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+                <input type="date" name="check_out" class="w-full rounded-lg border-gray-300 border px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tamu</label>
+                <select name="guests" class="w-full rounded-lg border-gray-300 border px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+                    <option value="1">1 Tamu</option>
+                    <option value="2" selected>2 Tamu</option>
+                    <option value="3">3 Tamu</option>
+                    <option value="4">4 Tamu</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Kamar</label>
+                <select name="room_type" class="w-full rounded-lg border-gray-300 border px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+                    <option value="">Semua Tipe</option>
+                    @foreach($roomTypes as $type)
+                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-2.5 rounded-lg transition">
+                    Cari Kamar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">Tipe Kamar Kami</h2>
+        <p class="mt-4 text-gray-600">Pilih kamar yang sesuai dengan kebutuhan Anda</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        @foreach($roomTypes as $type)
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+            <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                @if($type->image)
+                    <img src="{{ asset('storage/' . $type->image) }}" alt="{{ $type->name }}" class="w-full h-full object-cover">
+                @else
+                    <span class="text-6xl">🏨</span>
+                @endif
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">{{ $type->name }}</h3>
+                <p class="text-gray-600 text-sm mb-4">{{ $type->description }}</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">{{ $type->rooms_count }} Kamar</span>
+                    <span class="text-sm text-gray-500">Kapasitas: {{ $type->capacity }} org</span>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+
+@if($featuredRooms->isNotEmpty())
+<div class="bg-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900">Kamar Pilihan</h2>
+            <p class="mt-4 text-gray-600">Kamar terbaik dengan harga spesial</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            @foreach($featuredRooms as $room)
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                <div class="h-48 bg-gray-200 flex items-center justify-center overflow-hidden">
+                    @if(!empty($room->photos) && count($room->photos) > 0)
+                        <img src="{{ asset('storage/' . $room->photos[0]) }}" alt="{{ $room->roomType->name }}" class="w-full h-full object-cover">
+                    @else
+                        <span class="text-6xl">🛏️</span>
+                    @endif
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold">{{ $room->roomType->name }}</h3>
+                    <p class="text-2xl font-bold text-amber-600 mt-2">Rp {{ number_format($room->price, 0, ',', '.') }}<span class="text-sm text-gray-500 font-normal">/malam</span></p>
+                    <p class="text-sm text-gray-500 mt-2">Kamar {{ $room->room_number }}</p>
+                    <a href="{{ route('rooms.show', $room) }}" class="mt-4 inline-block w-full text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-lg transition">
+                        Lihat Detail
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
+<div class="bg-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Mengapa Memilih Santara Hotel?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="p-6">
+                <div class="text-5xl mb-4">🔒</div>
+                <h3 class="text-xl font-semibold mb-2">Pembayaran Aman</h3>
+                <p class="text-gray-600">Transaksi online yang aman dan terpercaya</p>
+            </div>
+            <div class="p-6">
+                <div class="text-5xl mb-4">⚡</div>
+                <h3 class="text-xl font-semibold mb-2">Konfirmasi Instan</h3>
+                <p class="text-gray-600">Booking langsung terkonfirmasi setelah pembayaran</p>
+            </div>
+            <div class="p-6">
+                <div class="text-5xl mb-4">🔄</div>
+                <h3 class="text-xl font-semibold mb-2">Pembatalan Mudah</h3>
+                <p class="text-gray-600">Kebijakan pembatalan yang fleksibel</p>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
